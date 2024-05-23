@@ -1,0 +1,44 @@
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: elastic
+  namespace: elastic-deployment
+spec:
+  version: 8.13.4
+  # volumeClaimDeletePolicy: DeleteOnScaledownOnly
+  nodeSets:
+  - name: custom
+    count: 3
+    config:
+      # node.master: true
+      # node.data: true
+      # node.ingest: true
+      node.store.allow_mmap: false
+      # enabling anonymous access
+      xpack.security.authc:
+        anonymous:
+          username: anonymous
+          roles: superuser
+          authz_exception: false
+    # podTemplate:
+    #   spec:
+    #     containers:
+    #     - name: elasticsearch
+    #       volumeMounts:
+    #       - name: elasticsearch-data
+    #         mountPath: /usr/share/elasticsearch/data
+    #     volumes:
+    #     - name: elasticsearch-data
+    #       persistentVolumeClaim:
+    #         claimName: ebs-claim
+    # request xx of persistent data storage for pods in this topology element
+    volumeClaimTemplates:
+    - metadata:
+        name: elasticsearch-data
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: managed-csi

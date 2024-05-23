@@ -1,0 +1,17 @@
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: es-kibana
+spec:
+  version: 8.13.4
+  count: 1
+  config:
+    xpack.security.authc.providers:
+      anonymous.anonymous1:
+        credentials: elasticsearch_anonymous_user
+        order: 0
+      basic.basic1:
+        order: 1
+    xpack.security.authc.selector.enabled: false
+  elasticsearchRef:
+    name: elastic
