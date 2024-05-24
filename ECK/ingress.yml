@@ -6,6 +6,8 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   ingressClassName: nginx
   tls:
@@ -17,7 +19,14 @@ spec:
     http:
       paths:
       - pathType: Prefix
-        path: /
+        path: /?(.*)
+        backend:
+          service:
+            name: es-kibana-kb-http
+            port:
+              name: https
+      - pathType: Prefix
+        path: /elastic/?(.*)
         backend:
           service:
             name: elastic-es-http
