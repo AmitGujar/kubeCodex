@@ -1,0 +1,89 @@
+neo4j:
+  name: my-standalone
+  resources:
+    cpu: "0.5"
+    memory: "4Gi"
+
+  password: "test1234"
+
+volumes:
+  data:
+    mode: "volume"
+    volume:
+      persistentVolumeClaim:
+        claimName: ebs-claim
+
+# volumes:
+#   data:
+#     mode: "dynamic"
+#     dynamic:
+#       storageClassName: managed-csi
+
+# services:
+#   neo4j:
+#     enabled: true
+#     annotations: {}
+
+#     spec:
+#       type: LoadBalancer
+#       loadBalancerIP: 4.240.32.221
+
+#     ports:
+#       http:
+#         enabled: true
+#         port: 80
+#         targetPort: 7474
+
+#       https:
+#         enabled: true 
+#         port: 443
+#         targetPort: 7473
+
+#       bolt:
+#         enabled: true
+#         port: 7687
+#         targetPort: 7687
+
+startupProbe:
+  failureThreshold: 1000
+  periodSeconds: 40
+
+ssl:
+# setting per "connector" matching neo4j config
+  bolt:
+    privateKey:
+      secretName: tls-secret-x
+      subPath: tls.key
+    publicCertificate:
+      secretName: tls-secret-x
+      subPath: tls.crt
+  https:
+    privateKey:
+      secretName: tls-secret-x
+      subPath: tls.key
+    publicCertificate:
+      secretName: tls-secret-x
+      subPath: tls.crt
+    trustedCerts:
+      sources:
+      - secret:
+          name: tls-secret-x
+          items:
+          - key: tls.crt
+            path: public.crt
+  cluster:
+    privateKey:
+      secretName: tls-secret-x
+      subPath: tls.key
+    publicCertificate:
+      secretName: tls-secret-x
+      subPath: tls.crt
+    trustedCerts:
+      sources:
+      - secret:
+          name: tls-secret-x
+          items:
+          - key: tls.crt
+            path: public.crt
+    revokedCerts:
+      sources: [ ]

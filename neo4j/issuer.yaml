@@ -1,0 +1,29 @@
+# Cluster Issuer
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-production
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: amitgujar3342@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-production
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+
+# ---
+# apiVersion: cert-manager.io/v1
+# kind: Certificate
+# metadata:
+#   name: production-certificate
+# spec:
+#   secretName: tls-secret-x
+#   issuerRef:
+#     kind: ClusterIssuer
+#     name: letsencrypt-production
+#   commonName: "*.9-tails-fox.tech"
+#   dnsNames:
+#     - "*.9-tails-fox.tech"
