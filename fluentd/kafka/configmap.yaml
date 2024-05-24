@@ -74,7 +74,7 @@ data:
   kafka-fluent.conf: |-
     <match **>
       @type kafka2
-      brokers "#{ENV['FLUENT_KAFKA2_BROKERS'] || '4.188.91.99:9094'}"
+      brokers "#{ENV['FLUENT_KAFKA2_BROKERS'] || '4.224.160.55:9094'}"
       default_topic "#{ENV['FLUENT_KAFKA2_DEFAULT_TOPIC'] || 'logs'}"
       <format>
         @type json

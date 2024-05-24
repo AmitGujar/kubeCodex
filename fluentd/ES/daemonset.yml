@@ -25,12 +25,12 @@ spec:
       containers:
       - name: fluentd
         imagePullPolicy: "Always"
-        image: fluent/fluentd-kubernetes-daemonset:v1.12-debian-kafka2-1
+        image: fluent/fluentd-kubernetes-daemonset:v1-debian-elasticsearch
         env:
-          - name:  FLUENT_KAFKA2_BROKERS
-            value: "4.188.91.99:9094"
-          - name:  FLUENT_KAFKA2_DEFAULT_TOPIC
-            value: "logs"
+          - name:  FLUENT_ELASTICSEARCH_HOST
+            value: "elastic.akstest.tech/elastic"
+          - name:  FLUENT_ELASTICSEARCH_PORT
+            value: "80"
         resources:
           limits:
             memory: 200Mi
