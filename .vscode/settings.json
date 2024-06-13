@@ -1,0 +1,5 @@
+{
+  "yaml.schemas": {
+    "https://json.schemastore.org/chart.json": "file:///home/amitdg/Desktop/kubeCodex/loki/loki.yaml"
+  }
+}
