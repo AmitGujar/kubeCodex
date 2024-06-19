@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: temp-deployment
+spec:
+  selector:
+    matchLabels:
+      app: temp-deployment
+  template:
+    metadata:
+      labels:
+        app: temp-deployment
+    spec:
+      containers:
+      - name: temp-deployment
+        image: nginx:latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+
