@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: jenkins-service
   namespace: jenkins
+  labels:
+    app: jenkins
   annotations:
       prometheus.io/scrape: 'true'
       prometheus.io/path:   /
@@ -10,7 +12,7 @@ metadata:
 spec:
   selector:
     app: jenkins-server
-  type: LoadBalancer
+  type: ClusterIP
   ports:
     - port: 80
       targetPort: 8080
