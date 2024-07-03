@@ -1,0 +1,352 @@
+clusterZone: "cluster.local"
+kubernetesURL: "https://kubernetes.default"
+renderHelmLabels: true
+
+controller:
+  componentName: "jenkins-controller"
+  image:
+    registry: "docker.io"
+    repository: "jenkins/jenkins"
+    tagLabel: jdk17
+    pullPolicy: "Always"
+
+  numExecutors: 0
+  executorMode: "NORMAL"
+
+  admin:
+    username: "admin"
+    password: "test"
+
+    userKey: jenkins-admin-user
+    passwordKey: jenkins-admin-password
+    createSecret: true
+  jenkinsAdminEmail:
+
+  jenkinsHome: "/var/jenkins_home"
+
+  jenkinsRef: "/usr/share/jenkins/ref"
+
+  jenkinsWar: "/usr/share/jenkins/jenkins.war"
+
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "256Mi"
+    limits:
+      cpu: "2000m"
+      memory: "4096Mi"
+
+  # Share process namespace to allow sidecar containers to interact with processes in other containers in the same pod
+  shareProcessNamespace: false
+
+  # -- Enable pod security context (must be `true` if podSecurityContextOverride, runAsUser or fsGroup are set)
+  usePodSecurityContext: true
+
+  # Note that `runAsUser`, `fsGroup`, and `securityContextCapabilities` are
+  # being deprecated and replaced by `podSecurityContextOverride`.
+  # Set runAsUser to 1000 to let Jenkins run as non-root user 'jenkins', which exists in 'jenkins/jenkins' docker image.
+  # When configuring runAsUser to a different value than 0 also set fsGroup to the same value:
+  # -- Deprecated in favor of `controller.podSecurityContextOverride`. uid that jenkins runs with.
+  runAsUser: 1000
+
+  # -- Deprecated in favor of `controller.podSecurityContextOverride`. uid that will be used for persistent volume.
+  fsGroup: 1000
+
+  # If you have PodSecurityPolicies that require dropping of capabilities as suggested by CIS K8s benchmark, put them here
+  # securityContextCapabilities:
+  #  drop:
+  #    - NET_RAW
+  securityContextCapabilities: {}
+
+  # In the case of mounting an ext4 filesystem, it might be desirable to use `supplementalGroups` instead of `fsGroup` in
+  # the `securityContext` block: https://github.com/kubernetes/kubernetes/issues/67014#issuecomment-589915496
+  # podSecurityContextOverride:
+  #   runAsUser: 1000
+  #   runAsNonRoot: true
+  #   supplementalGroups: [1000]
+  #   capabilities: {}
+  # -- Completely overwrites the contents of the pod security context, ignoring the values provided for `runAsUser`, `fsGroup`, and `securityContextCapabilities`
+  podSecurityContextOverride: ~
+
+  # -- Allow controlling the securityContext for the jenkins container
+  containerSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+
+  # For minikube, set this to NodePort, elsewhere uses LoadBalancer
+  # Using service type as clusterip since we are using ingress to expose the service.
+  serviceType: ClusterIP
+  # -- k8s service clusterIP. Only used if serviceType is ClusterIP
+  clusterIp:
+  # -- k8s service port
+  servicePort: 8080
+  # -- k8s target port
+  targetPort: 8080
+  # -- Create Agent listener service
+  agentListenerEnabled: true
+  # -- Listening port for agents
+  agentListenerPort: 50000
+
+  # -- Enable agent listener load balancer source ranges right now this is not required because we are using clusterip service type
+  # agentListenerLoadBalancerSourceRanges:
+  #   - 0.0.0.0/0
+  # -- Disabled agent protocols
+  disabledAgentProtocols:
+    - JNLP-connect
+    - JNLP2-connect
+  csrf:
+    defaultCrumbIssuer:
+      # -- Enable the default CSRF Crumb issuer
+      enabled: true
+      # -- Enable proxy compatibility
+      proxyCompatability: true
+
+  agentListenerServiceType: "ClusterIP"
+  installPlugins:
+    - kubernetes:4248.vfa_9517757b_b_a_
+    - workflow-aggregator:596.v8c21c963d92d
+    - git:5.2.2
+    - configuration-as-code:1810.v9b_c30a_249a_4c
+
+  installLatestPlugins: true
+
+  # Without this; whenever the controller gets restarted (Evicted, etc.) it will fetch plugin updates that have the potential to cause breakage.
+  # Note that for this to work, `persistence.enabled` needs to be set to `true`
+  # -- Initialize only on first installation. Ensures plugins do not get updated inadvertently. Requires `persistence.enabled` to be set to `true`
+  initializeOnce: true
+  cloudName: "kubernetes"
+
+  # Below is the implementation of Jenkins Configuration as Code. Add a key under configScripts for each configuration area,
+  # where each corresponds to a plugin or section of the UI. Each key (prior to | character) is just a label, and can be any value.
+  # Keys are only used to give the section a meaningful name. The only restriction is they may only contain RFC 1123 \ DNS label
+  # characters: lowercase letters, numbers, and hyphens. The keys become the name of a configuration yaml file on the controller in
+  # /var/jenkins_home/casc_configs (by default) and will be processed by the Configuration as Code Plugin. The lines after each |
+  # become the content of the configuration yaml file. The first line after this is a JCasC root element, e.g., jenkins, credentials,
+  # etc. Best reference is https://<jenkins_url>/configuration-as-code/reference. The example below creates a welcome message:
+  JCasC:
+    # -- Enables default Jenkins configuration via configuration as code plugin
+    defaultConfig: true
+
+    # If true, the init container deletes all the plugin config files and Jenkins Config as Code overwrites any existing configuration
+    # -- Whether Jenkins Config as Code should overwrite any existing configuration
+    overwriteConfiguration: false
+    # -- Remote URLs for configuration files.
+    configUrls: []
+    # - https://acme.org/jenkins.yaml
+    # -- List of Jenkins Config as Code scripts
+    configScripts: {}
+    #  welcome-message: |
+    #    jenkins:
+    #      systemMessage: Welcome to our CI\CD server. This Jenkins is configured and managed 'as code'.
+
+    # Allows adding to the top-level security JCasC section. For legacy purposes, by default, the chart includes apiToken configurations
+    # -- Jenkins Config as Code security-section
+    security:
+      apiToken:
+        creationOfLegacyTokenEnabled: false
+        tokenGenerationOnCreationEnabled: false
+        usageStatisticsEnabled: true
+
+    # Ignored if securityRealm is defined in controller.JCasC.configScripts
+    # -- Jenkins Config as Code Security Realm-section
+    securityRealm: |-
+      local:
+        allowsSignup: false
+        enableCaptcha: false
+        users:
+        - id: "${chart-admin-username}"
+          name: "Jenkins Admin"
+          password: "${chart-admin-password}"
+
+    # Ignored if authorizationStrategy is defined in controller.JCasC.configScripts
+    # -- Jenkins Config as Code Authorization Strategy-section
+    authorizationStrategy: |-
+      loggedInUsersCanDoAnything:
+        allowAnonymousRead: false
+
+  sidecars:
+    configAutoReload:
+      enabled: true
+      image:
+        registry: docker.io
+        repository: kiwigrid/k8s-sidecar
+        tag: 1.27.4
+      imagePullPolicy: IfNotPresent
+
+      scheme: http
+      skipTlsVerify: false
+
+      reqRetryConnect: 10
+
+      # SSH port value can be set to any unused TCP port. The default, 1044, is a non-standard SSH port that has been chosen at random.
+      # This is only used to reload JCasC config from the sidecar container running in the Jenkins controller pod.
+      # This TCP port will not be open in the pod (unless you specifically configure this), so Jenkins will not be
+      # accessible via SSH from outside the pod. Note if you use non-root pod privileges (runAsUser & fsGroup),
+      # this must be > 1024:
+      sshTcpPort: 1044
+      # folder in the pod that should hold the collected dashboards:
+      folder: "/var/jenkins_home/casc_configs"
+
+      containerSecurityContext:
+        readOnlyRootFilesystem: true
+        allowPrivilegeEscalation: false
+
+  ingress:
+    # -- Enables ingress
+    enabled: true
+    apiVersion: "extensions/v1beta1"
+    # -- Ingress labels
+    labels:
+      app: jenkins
+    annotations:
+      {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+    ingressClassName: nginx
+
+    # Set this path to jenkinsUriPrefix above or use annotations to rewrite path
+    # -- Ingress path
+    path:
+
+    # configures the hostname e.g. jenkins.example.com
+    # -- Ingress hostname
+    hostName: jenkins.akstest.tech
+    resourceRootUrl:
+    tls:
+      - secretName: tls-secret
+        hosts:
+          - jenkins.akstest.tech
+
+  # often you want to have your controller all locked down and private,
+  # but you still want to get webhooks from your SCM
+
+  # -- Can be used to disable rendering controller test resources when using helm template
+  testEnabled: true
+
+  httpsKeyStore:
+    # -- Enables HTTPS keystore on jenkins controller
+    enable: false
+    # -- Name of the secret that already has ssl keystore
+    jenkinsHttpsJksSecretName: ""
+    # -- Name of the key in the secret that already has ssl keystore
+    jenkinsHttpsJksSecretKey: "jenkins-jks-file"
+    # -- Name of the secret that contains the JKS password, if it is not in the same secret as the JKS file
+    jenkinsHttpsJksPasswordSecretName: ""
+    # -- Name of the key in the secret that contains the JKS password
+    jenkinsHttpsJksPasswordSecretKey: "https-jks-password"
+    disableSecretMount: false
+
+    # When HTTPS keystore is enabled, servicePort and targetPort will be used as HTTPS port
+    # -- HTTP Port that Jenkins should listen to along with HTTPS, it also serves as the liveness and readiness probes port.
+    httpPort: 8081
+    # -- Path of HTTPS keystore file
+    path: "/var/jenkins_keystore"
+    # -- Jenkins keystore filename which will appear under controller.httpsKeyStore.path
+    fileName: "keystore.jks"
+    # -- Jenkins keystore password
+    password: "password"
+
+agent:
+  # -- Enable Kubernetes plugin jnlp-agent podTemplate
+  enabled: true
+  # -- The connection timeout in seconds for connections to Kubernetes API. The minimum value is 5
+  kubernetesConnectTimeout: 5
+  # -- The read timeout in seconds for connections to Kubernetes API. The minimum value is 15
+  kubernetesReadTimeout: 15
+  # -- The maximum concurrent connections to Kubernetes API
+  maxRequestsPerHostStr: "32"
+  # -- Time in minutes after which the Kubernetes cloud plugin will clean up an idle worker that has not already terminated
+  retentionTimeout: 5
+  # -- Seconds to wait for pod to be running
+  waitForPodSec: 600
+  jnlpregistry:
+  image:
+    # -- Repository to pull the agent jnlp image from
+    repository: "jenkins/inbound-agent"
+    # -- Tag of the image to pull
+    tag: "3256.v88a_f6e922152-1"
+  # -- Configure working directory for default agent
+  workingDir: "/home/jenkins/agent"
+  nodeUsageMode: "NORMAL"
+  # -- Append Jenkins labels to the agent
+  customJenkinsLabels: []
+  # -- Name of the secret to be used to pull the image
+  imagePullSecretName:
+  componentName: "jenkins-agent"
+  # -- Enables agent communication via websockets
+  websocket: false
+  directConnection: false
+  # -- Agent privileged container
+  privileged: false
+  # -- Configure container user
+  runAsUser:
+  # -- Configure container group
+  runAsGroup:
+  # -- Enables the agent to use the host network
+  hostNetworking: false
+  # -- Resources allocation (Requests and Limits)
+  resources:
+    requests:
+      cpu: "512m"
+      memory: "512Mi"
+      # ephemeralStorage:
+    limits:
+      cpu: "512m"
+      memory: "512Mi"
+      # ephemeralStorage:
+
+  # -- Command to execute when side container starts
+  command:
+  # -- Arguments passed to command to execute
+  args: "${computer.jnlpmac} ${computer.name}"
+  # -- Side container name
+  sideContainerName: "jnlp"
+
+  # Doesn't allocate pseudo TTY by default
+  # -- Allocate pseudo tty to the side container
+  TTYEnabled: false
+  # -- Max number of agents to launch
+  containerCap: 10
+  # -- Agent Pod base name
+  podName: "default"
+
+  # -- Allows the Pod to remain active for reuse until the configured number of minutes has passed since the last step was executed on it
+  idleMinutes: 0
+
+  # -- Defines how the raw yaml field gets merged with yaml definitions from inherited pod templates. Possible values: "merge" or "override"
+  yamlMergeStrategy: "override"
+  # -- Controls whether the defined yaml merge strategy will be inherited if another defined pod template is configured to inherit from the current one
+  inheritYamlMergeStrategy: false
+  # -- Timeout in seconds for an agent to be online
+  connectTimeout: 100
+
+  # Useful when configuring agents only with the podTemplates value, since the default podTemplate populated by values mentioned above will be excluded in the rendered template.
+  # -- Disable the default Jenkins Agent configuration
+  disableDefaultAgent: false
+
+persistence:
+  enabled: true
+  existingClaim:
+  storageClass: managed-csi
+  labels:
+    app: jenkins
+  accessMode: "ReadWriteOnce"
+  size: "8Gi"
+
+## Install Default RBAC roles and bindings
+rbac:
+  create: true
+  # -- Whether the Jenkins service account should be able to read Kubernetes secrets
+  readSecrets: false
+
+serviceAccount:
+  create: true
+  name:
+  annotations: {}
+  extraLabels: {}
+  imagePullSecretName:
+
+checkDeprecation: true
