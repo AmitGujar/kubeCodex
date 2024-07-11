@@ -22,3 +22,7 @@ else
     getting_started
     init_config
 fi
+
+
+# make sure to use inventory.sql if datasource exist outside of aks.
+# enable cdc first, provide required permissions, deploy connect cluster, deploy connector

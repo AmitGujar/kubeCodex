@@ -1,0 +1,21 @@
+# on vm edit the file located in /etc/mysql/mysql.cnf to do serverwide configuration
+# add following lines to enable cdc on mysql data source.
+
+
+# ----------------------------------------------
+# Enable the binlog for replication & CDC
+# ----------------------------------------------
+
+# Enable binary replication log and set the prefix, expiration, and log format.
+# The prefix is arbitrary, expiration can be short for integration tests but would
+# be longer on a production system. Row-level info is required for ingest to work.
+# Server ID is required, but this will vary on production systems
+server-id         = 223344
+log_bin           = mysql-bin
+binlog_expire_logs_seconds  = 86400
+binlog_format     = row
+
+
+# this is important for public access
+bind-address            = 0.0.0.0
+mysqlx-bind-address     = 0.0.0.0
