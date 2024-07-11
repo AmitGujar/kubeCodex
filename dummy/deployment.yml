@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+  namespace: jenkins
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+        - name: myapp
+          image: amitgujar/cloudmigration:latest
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-service
+  namespace: jenkins
+spec:
+  selector:
+    app: myapp
+  ports:
+    - port: 80
+      targetPort: 80
+  type: ClusterIP
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jenkins
+  namespace: jenkins
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - jenkins.konverto.ai
+      secretName: tls-secret
+  rules:
+    - host: jenkins.konverto.ai
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: myapp-service
+                port:
+                  number: 80
