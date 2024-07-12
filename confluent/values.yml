@@ -74,7 +74,7 @@ managedCerts:
 
 ###
 ## Image pull secret
-imagePullSecretRef:  confluent-registry
+imagePullSecretRef: confluent-registry
 ## Confluent Operator Image Information
 ##
 image:
@@ -186,7 +186,7 @@ rbac: true
 ## Enable extra Kubernetes API groups in role/clusterrole resource
 ## When set to true, it will add apiGroups to role/clusterrole for OpenShift route resource
 clusterRole:
-  openshift: true
+  openshift: false
 
 ###
 ### Confluent Telemetry Report configuration
@@ -264,4 +264,3 @@ licenseSecretRef: ""
 mountedVolumes:
   volumes: []
   volumeMounts: []
-
