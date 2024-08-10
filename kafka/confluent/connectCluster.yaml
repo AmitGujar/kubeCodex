@@ -1,0 +1,39 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Connect
+metadata:
+  name: connect
+spec:
+  keyConverterType: io.confluent.connect.avro.AvroConverter
+  valueConverterType: io.confluent.connect.avro.AvroConverter
+  replicas: 1
+  image:
+    application: confluentinc/cp-server-connect:7.6.0
+    init: confluentinc/confluent-init-container:2.8.0
+  build:
+    type: onDemand
+    onDemand:
+      plugins:
+        confluentHub:
+          - name: debezium-connector-sqlserver
+            owner: debezium
+            version: latest
+          - name: debezium-connector-postgresql
+            owner: debezium
+            version: latest
+      storageLimit: 5Gi
+  dependencies:
+    kafka:
+      bootstrapEndpoint: lkc-v5dw9j.domzpn3kmlw.eastus.azure.confluent.cloud:9092
+      authentication:
+        type: plain
+        jaasConfig:
+          secretRef: ccloud-credentials
+      tls:
+        enabled: true
+        ignoreTrustStoreConfig: true
+    schemaRegistry:
+      url: https://psrc-jxv6q.uaenorth.azure.confluent.cloud
+      authentication:
+        type: basic
+        basic:
+          secretRef: ccloud-sr-credentials

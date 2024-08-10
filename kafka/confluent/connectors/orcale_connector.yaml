@@ -1,0 +1,38 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Connector
+metadata:
+  name: oracle-connector
+  namespace: confluent
+spec:
+  taskMax: 1
+  connectClusterRef:
+    name: connect
+  # connectRest:
+  #   endpoint: http://4.156.251.11:8083
+  class: "io.debezium.connector.oracle.OracleConnector"
+  configs:
+    connector.class: io.debezium.connector.oracle.OracleConnector
+    database.hostname: oracle.czqc84iqszd1.ap-south-1.rds.amazonaws.com
+    database.port: "1521"
+    database.user: "admin"
+    database.password: "G_CT70nRpMH3l9mN_Ri9{$pKz(V2"
+    database.dbname: "pocdemo"
+    database.server.name: "my-sqlserver-instance"
+    database.encrypt: "false"
+    database.trustServerCertificate: "false"
+    topic.prefix: "sqlserverxyz-xyz"
+    database.names: "pocdemo"
+    database.history.kafka.bootstrap.servers: "lkc-v5dw9j.domzpn3kmlw.eastus.azure.confluent.cloud:9092"
+    database.history.kafka.topic: "dbhistory.pocdemo.dbo"
+    database.history.consumer.security.protocol: "SASL_SSL"
+    database.history.consumer.ssl.endpoint.identification.algorithm: "https"
+    database.history.consumer.sasl.mechanism: "PLAIN"
+    database.history.consumer.sasl.jaas.config: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="KTGLJ6ETQVW7RYHN" password="M0xmyC3x1H3kT8TvFW3eltFxAE1Gfb714JSb4R5CsmgNvelUlULkPWN3p5c1IAUW";'
+    database.history.producer.security.protocol: "SASL_SSL"
+    database.history.producer.ssl.endpoint.identification.algorithm: "https"
+    database.history.producer.sasl.mechanism: "PLAIN"
+    database.history.producer.sasl.jaas.config: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="KTGLJ6ETQVW7RYHN" password="M0xmyC3x1H3kT8TvFW3eltFxAE1Gfb714JSb4R5CsmgNvelUlULkPWN3p5c1IAUW";'
+    topic.creation.default.replication.factor: "3"
+    topic.creation.default.partitions: "1"
+    schema.history.internal: "io.debezium.storage.file.history.FileSchemaHistory"
+    schema.history.internal.file.filename: "/opt/confluentinc/data/schema_history.dat"

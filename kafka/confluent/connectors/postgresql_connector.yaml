@@ -1,0 +1,36 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Connector
+metadata:
+  name: postgrsql-connector
+spec:
+  taskMax: 1
+  connectClusterRef:
+    name: connect
+  class: "io.debezium.connector.postgresql.PostgresConnector"
+  configs:
+    connector.class: io.debezium.connector.postgresql.PostgresConnector
+    database.hostname: "postgres.czqc84iqszd1.ap-south-1.rds.amazonaws.com"
+    database.port: "5432"
+    database.user: "postgres"
+    database.password: "v~$z_3e3[%%(yby+cRo<Wy?vsZd%"
+    database.dbname: "testdb"
+    database.server.name: "postgres"
+    database.trustServerCertificate: "false"
+    topic.prefix: "spostgresqlqlserverxyz-xyz"
+    database.names: "testdb"
+    plugin.name: "pgoutput"
+    table.include.list: "public.users"
+    topic.creation.default.partitions: "1"
+    database.history.kafka.bootstrap.servers: "pkc-12576z.us-west2.gcp.confluent.cloud:9092"
+    database.history.kafka.topic: "dbhistory.52.151.248.204.dbo"
+    database.history.consumer.security.protocol: "SASL_SSL"
+    database.history.consumer.ssl.endpoint.identification.algorithm: "https"
+    database.history.consumer.sasl.mechanism: "PLAIN"
+    database.history.consumer.sasl.jaas.config: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="LHENM3FL2IU3F3YW" password="Py3DyOGCvtcJpDOfEi0pbmbgfMfay89BDsFL374iNjylIqteEe0wHm8w9UZ9y5RJ";'
+    database.history.producer.security.protocol: "SASL_SSL"
+    database.history.producer.ssl.endpoint.identification.algorithm: "https"
+    database.history.producer.sasl.mechanism: "PLAIN"
+    database.history.producer.sasl.jaas.config: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="LHENM3FL2IU3F3YW" password="Py3DyOGCvtcJpDOfEi0pbmbgfMfay89BDsFL374iNjylIqteEe0wHm8w9UZ9y5RJ";'
+    topic.creation.default.replication.factor: "3"
+    schema.history.internal: "io.debezium.storage.file.history.FileSchemaHistory"
+    schema.history.internal.file.filename: "/opt/confluentinc/data/schema_history.dat"

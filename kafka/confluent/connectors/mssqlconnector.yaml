@@ -1,0 +1,70 @@
+apiVersion: platform.confluent.io/v1beta1
+kind: Connector
+metadata:
+  name: sqlserver-connector
+  namespace: confluent
+spec:
+  taskMax: 1
+  connectClusterRef:
+    name: connect
+  # connectRest:
+  #   endpoint: http://4.156.251.11:8083
+  class: "io.debezium.connector.sqlserver.SqlServerConnector"
+  configs:
+    connector.class: io.debezium.connector.sqlserver.SqlServerConnector
+    database.hostname: 10.249.0.4
+    database.port: "1433"
+    database.user: "sqladmin"
+    database.password: "sql@123"
+    database.dbname: "pocdemo"
+    database.server.name: "my-sqlserver-instance"
+    database.encrypt: "false"
+    database.trustServerCertificate: "false"
+    topic.prefix: "sqlserverxyz-xyz"
+    database.names: "pocdemo"
+    database.history.kafka.bootstrap.servers: "lkc-v5dw9j.domzpn3kmlw.eastus.azure.confluent.cloud:9092"
+    database.history.kafka.topic: "dbhistory.pocdemo.dbo"
+    database.history.consumer.security.protocol: "SASL_SSL"
+    database.history.consumer.ssl.endpoint.identification.algorithm: "https"
+    database.history.consumer.sasl.mechanism: "PLAIN"
+    database.history.consumer.sasl.jaas.config: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="KTGLJ6ETQVW7RYHN" password="M0xmyC3x1H3kT8TvFW3eltFxAE1Gfb714JSb4R5CsmgNvelUlULkPWN3p5c1IAUW";'
+    database.history.producer.security.protocol: "SASL_SSL"
+    database.history.producer.ssl.endpoint.identification.algorithm: "https"
+    database.history.producer.sasl.mechanism: "PLAIN"
+    database.history.producer.sasl.jaas.config: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="KTGLJ6ETQVW7RYHN" password="M0xmyC3x1H3kT8TvFW3eltFxAE1Gfb714JSb4R5CsmgNvelUlULkPWN3p5c1IAUW";'
+    topic.creation.default.replication.factor: "3"
+    topic.creation.default.partitions: "1"
+    schema.history.internal: "io.debezium.storage.file.history.FileSchemaHistory"
+    schema.history.internal.file.filename: "/opt/confluentinc/data/schema_history.dat"
+
+
+
+#another file
+# apiVersion: platform.confluent.io/v1beta1
+# kind: Connector
+# metadata:
+#   name: mssqlconnector
+#   namespace: confluent
+# spec:
+#   class: "io.debezium.connector.sqlserver.SqlServerConnector"
+#   taskMax: 1
+#   connectClusterRef:
+#     name: connect
+#   configs:
+#     database.hostname: "test-sqlserver-01.database.windows.net"
+#     database.names: "test"
+#     database.user: "sql"
+#     database.password: "Ashutosh8853@"
+#     database.port: "1433"
+#     schema.history.internal.kafka.topic: "dbhistory.sqlserver"
+#     schema.history.internal.kafka.bootstrap.servers: "pkc-12576z.us-west2.gcp.confluent.cloud:9092"
+#     topic.prefix: "quickstart-jdbc-CRD"
+#     schema.history.internal.kafka.topic: "schemahistory.mssql"
+#     schema.history.internal.consumer.security.protocol: "SASL_SSL"
+#     schema.history.internal.consumer.sasl.mechanism: "PLAIN"
+#     schema.history.internal.consumer.sasl.jaas.config: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"LHENM3FL2IU3F3YW\" password=\"Py3DyOGCvtcJpDOfEi0pbmbgfMfay89BDsFL374iNjylIqteEe0wHm8w9UZ9y5RJ\";"
+#     schema.history.internal.producer.security.protocol: "SASL_SSL"
+#     schema.history.internal.producer.sasl.mechanism: "PLAIN"
+#     schema.history.internal.producer.sasl.jaas.config: "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"LHENM3FL2IU3F3YW\" password=\"Py3DyOGCvtcJpDOfEi0pbmbgfMfay89BDsFL374iNjylIqteEe0wHm8w9UZ9y5RJ\";"
+#     database.encrypt: "true"
+#     database.trustServerCertificate: "true"

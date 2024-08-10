@@ -1,0 +1,132 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-connect
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-connect
+  template:
+    metadata:
+      labels:
+        app: kafka-connect
+    spec:
+      containers:
+        - name: kafka-connect
+          image: amitgujar/confluent-server-connect:latest
+          resources:
+            limits:
+              memory: "4Gi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8083
+          env:
+            - name: CONNECT_LOG4J_APPENDER_STDOUT_LAYOUT_CONVERSIONPATTERN
+              value: "[%d] %p %X{connector.context}%m (%c:%L)%n"
+            - name: CONNECT_CUB_KAFKA_TIMEOUT
+              value: "300"
+            - name: CONNECT_BOOTSTRAP_SERVERS
+              value: "lkc-gj0vr1.domzpn3kmlw.eastus.azure.confluent.cloud:9092"
+            - name: CONNECT_REST_ADVERTISED_HOST_NAME
+              value: "connect"
+            - name: CONNECT_REST_PORT
+              value: "8083"
+            - name: CONNECT_GROUP_ID
+              value: "kafka-connect12"
+            - name: CONNECT_CONFIG_STORAGE_TOPIC
+              value: "docker-connect-configs"
+            - name: CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR
+              value: "3"
+            - name: CONNECT_OFFSET_FLUSH_INTERVAL_MS
+              value: "10000"
+            - name: CONNECT_OFFSET_STORAGE_TOPIC
+              value: "docker-connect-offsets"
+            - name: CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR
+              value: "3"
+            - name: CONNECT_STATUS_STORAGE_TOPIC
+              value: "docker-connect-status"
+            - name: CONNECT_STATUS_STORAGE_REPLICATION_FACTOR
+              value: "3"
+            - name: CONNECT_KEY_CONVERTER
+              value: "org.apache.kafka.connect.storage.StringConverter"
+            - name: CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL
+              value: "https://psrc-jxv6q.uaenorth.azure.confluent.cloud"
+            - name: CONNECT_KEY_CONVERTER_BASIC_AUTH_CREDENTIALS_SOURCE
+              value: "USER_INFO"
+            - name: CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO
+              value: "COIRPYF2SIGERAY6:wZJyy43i9SCVTz41LSIHiopY1gnov/Qtal8BTA1Fs1C3+lb/mV2imRTWL/drijp8"
+            - name: CONNECT_VALUE_CONVERTER
+              value: "io.confluent.connect.avro.AvroConverter"
+            - name: CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL
+              value: "https://psrc-jxv6q.uaenorth.azure.confluent.cloud"
+            - name: CONNECT_VALUE_CONVERTER_BASIC_AUTH_CREDENTIALS_SOURCE
+              value: "USER_INFO"
+            - name: CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_BASIC_AUTH_USER_INFO
+              value: "COIRPYF2SIGERAY6:wZJyy43i9SCVTz41LSIHiopY1gnov/Qtal8BTA1Fs1C3+lb/mV2imRTWL/drijp8"
+            - name: CONNECT_REQUEST_TIMEOUT_MS
+              value: "20000"
+            - name: CONNECT_RETRY_BACKOFF_MS
+              value: "500"
+            - name: CONNECT_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM
+              value: "https"
+            - name: CONNECT_SASL_MECHANISM
+              value: "PLAIN"
+            - name: CONNECT_SECURITY_PROTOCOL
+              value: "SASL_SSL"
+            - name: CONNECT_SASL_JAAS_CONFIG
+              value: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="AFEU3TAGU4PZU5WZ" password="ilNhqScCW2OKOCO7sdAdcfWpzJsWjB9Yih80jD3jaMQ+ixgcpTty4FLV8fW78Ra/";'
+            - name: CONNECT_CONSUMER_SECURITY_PROTOCOL
+              value: "SASL_SSL"
+            - name: CONNECT_CONSUMER_SASL_MECHANISM
+              value: "PLAIN"
+            - name: CONNECT_CONSUMER_SASL_JAAS_CONFIG
+              value: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="AFEU3TAGU4PZU5WZ" password="ilNhqScCW2OKOCO7sdAdcfWpzJsWjB9Yih80jD3jaMQ+ixgcpTty4FLV8fW78Ra/";'
+            - name: CONNECT_CONSUMER_REQUEST_TIMEOUT_MS
+              value: "20000"
+            - name: CONNECT_CONSUMER_RETRY_BACKOFF_MS
+              value: "500"
+            - name: CONNECT_PRODUCER_SECURITY_PROTOCOL
+              value: "SASL_SSL"
+            - name: CONNECT_PRODUCER_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM
+              value: "https"
+            - name: CONNECT_PRODUCER_SASL_MECHANISM
+              value: "PLAIN"
+            - name: CONNECT_PRODUCER_SASL_JAAS_CONFIG
+              value: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="AFEU3TAGU4PZU5WZ" password="ilNhqScCW2OKOCO7sdAdcfWpzJsWjB9Yih80jD3jaMQ+ixgcpTty4FLV8fW78Ra/";'
+            - name: CONNECT_PRODUCER_RETRY_BACKOFF_MS
+              value: "500"
+            - name: CONNECT_PLUGIN_PATH
+              value: "/usr/share/confluent-hub-components"
+          volumeMounts:
+            - name: data-volume
+              mountPath: /data
+            - name: plugins-volume
+              mountPath: /usr/share/confluent-hub-components
+          command: ["/bin/bash", "-c", "--"]
+          args:
+            - |
+              confluent-hub install --no-prompt debezium/debezium-connector-sqlserver:latest
+              /etc/confluent/docker/run &
+              echo "done"
+              sleep infinity
+      volumes:
+        - name: data-volume
+          hostPath:
+            path: /home/appuser/confluent/new/data
+        - name: plugins-volume
+          hostPath:
+            path: /home/appuser/confluent/new/plugins
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-connect
+spec:
+  selector:
+    app: kafka-connect
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8083
+      targetPort: 8083
