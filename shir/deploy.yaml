@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adf-shir
+  labels:
+    app: windows
+spec:
+  selector:
+    matchLabels:
+      app: adf-shir
+  template:
+    metadata:
+      labels:
+        app: adf-shir
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: agentpool
+                    operator: In
+                    values:
+                      - adf
+      containers:
+        - name: adf-shir
+          image: amitgujar/adfshir:latest
+          ports:
+            - containerPort: 8060
+          env:
+            - name: AUTH_KEY
+              value: "IR@67c522ed-fdaf-4891-8cba-5f4f6bcd8275@perfect-factory@ServiceEndpoint=perfect-factory.eastus.datafactory.azure.net@dLTZOzTdMp7oJ6m+mhmelos+Y/xmUJ+GcDTcMwwYDaw="
+            - name: AE_TIME
+              value: "7200"
+            - name: ENABLE_HA
+              value: "true"
+            - name: SHIR_WINDOWS_CONTAINER_ENV
+              value: "true"
