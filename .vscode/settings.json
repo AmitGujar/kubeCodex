@@ -1,5 +1,6 @@
 {
   "yaml.schemas": {
-    "https://json.schemastore.org/chart.json": "file:///home/amitdg/Desktop/kubeCodex/loki/loki.yaml"
+    "https://json.schemastore.org/chart.json": "file:///home/amitdg/Desktop/kubeCodex/loki/loki.yaml",
+    "kubernetes://schema/apps/v1@deployment": "file:///home/amitdg/Desktop/kubeCodex/shir/deploy.yaml"
   }
 }
