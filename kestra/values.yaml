@@ -1,0 +1,43 @@
+configuration:
+  kestra:
+    queue:
+      type: postgres
+    repository:
+      type: postgres
+    storage:
+      type: azure
+      azure:
+        container: "backups"
+        # storage account endpoint name
+        endpoint: 
+        # Change the endpoint to the Azure Blob Storage account
+        connectionString:
+
+  datasources:
+    postgres:
+      url: jdbc:postgresql://20.171.241.80:5432/kestra_db  # Change database from 'template1' to 'kestra'
+      driverClassName: org.postgresql.Driver
+      username: dbusername
+      password: dbpassword
+
+postgresql:
+  enabled: false  # Ensure an external PostgreSQL is running
+
+minio:
+  enabled: false
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  hosts:
+    - host: kestra.morecloudprivate.shop
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: 
+    - secretName: chart-example-tls
+      hosts:
+        - kestra.morecloudprivate.shop
