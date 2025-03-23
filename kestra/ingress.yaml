@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+spec:
+  ingressClassName: public
+  tls:
+  - hosts:
+    - kestra.morecloudprivate.shop
+    secretName: tls-secret
+  rules:
+  - host: kestra.morecloudprivate.shop
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: my-kestra-service
+            port:
+              number: 8080

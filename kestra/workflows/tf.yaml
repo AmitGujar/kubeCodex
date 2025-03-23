@@ -1,0 +1,48 @@
+id: tf
+namespace: company.team
+
+tasks:
+  - id: az_cli
+    type: io.kestra.plugin.azure.cli.AzCLI
+    servicePrincipal: true
+    commands:
+      - az login --service-principal -u "" -p "" --tenant ""
+      - az account show
+
+  - id: git
+    type: io.kestra.plugin.core.flow.WorkingDirectory
+    tasks:
+      - id: clone_repository
+        type: io.kestra.plugin.git.Clone
+        url: https://MyInternalTesting@dev.azure.com/MyInternalTesting/Terraform_Azure_Infra/_git/Accelerator_Playground
+        branch: main
+        username: amit.gujar
+        password: 9uGxdi8ri4dKbNkOjNFF3vkyGcvYsOSXefMANEMWJxwPOwS737pwJQQJ99BCACAAAAAH2TR2AAASAZDO2nDK
+
+      - id: Terraform
+        type: io.kestra.plugin.terraform.cli.TerraformCLI
+        namespaceFiles:
+          enabled: true
+        beforeCommands:
+          # - az login --service-principal -u "246cfd43-77c5-4c63-8f77-d6a19a3876ec" -p "u9Z8Q~8Y-Lqc6nj52HHI9qUBlL4D4CXqi_5zta8t" --tenant "e4e34038-ea1f-4882-b6e8-ccd776459ca0"
+          - terraform init
+          - mkdir -p ~/.ssh
+          - echo "-----BEGIN RSA PRIVATE KEY-----
+                  
+                  -----END RSA PRIVATE KEY-----" > ~/.ssh/id_rsa
+          - chmod 600 ~/.ssh/id_rsa
+
+        commands:
+          - terraform plan -out main.tfplan -var-file=prod/prod.auto.tfvars
+          - terraform apply main.tfplan
+          
+
+        env:
+          AWS_ACCESS_KEY_ID: ""
+          AWS_SECRET_ACCESS_KEY: ""
+          AWS_DEFAULT_REGION: ""
+          ARM_CLIENT_ID: "246cfd43-77c5-4c63-8f77-d6a19a3876ec"
+          ARM_CLIENT_SECRET: ""
+          ARM_TENANT_ID: ""
+          ARM_SUBSCRIPTION_ID: "ee22c8f0-93df-4b47-925a-d337fef522fe"
+ 
