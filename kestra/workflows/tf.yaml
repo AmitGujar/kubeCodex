@@ -24,7 +24,6 @@ tasks:
         namespaceFiles:
           enabled: true
         beforeCommands:
-          # - az login --service-principal -u "246cfd43-77c5-4c63-8f77-d6a19a3876ec" -p "u9Z8Q~8Y-Lqc6nj52HHI9qUBlL4D4CXqi_5zta8t" --tenant "e4e34038-ea1f-4882-b6e8-ccd776459ca0"
           - terraform init
           - mkdir -p ~/.ssh
           - echo "-----BEGIN RSA PRIVATE KEY-----

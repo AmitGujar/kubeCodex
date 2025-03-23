@@ -8,8 +8,10 @@ configuration:
       type: azure
       azure:
         container: "backups"
-        endpoint: "https://storageAccountname.blob.core.windows.net/"
-        connectionString: ""
+        # storage account endpoint name
+        endpoint: 
+        # Change the endpoint to the Azure Blob Storage account
+        connectionString:
 
   datasources:
     postgres:
