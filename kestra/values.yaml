@@ -8,15 +8,15 @@ configuration:
       type: azure
       azure:
         container: "backups"
-        endpoint: "https://hacnpgpsab33ozt6h.blob.core.windows.net/"
-        connectionString: "DefaultEndpointsProtocol=https;AccountName=hacnpgpsab33ozt6h;AccountKey=Q2c3rjcqZmZWjXxWy0u2cEciEEQvEp6mdOQwx0RrzsMNC0DaeuPOsvIDfGNhnQD9yyHhJ6vVSQN/+AStZFDKVw==;EndpointSuffix=core.windows.net"
+        endpoint: "https://storageAccountname.blob.core.windows.net/"
+        connectionString: ""
 
   datasources:
     postgres:
       url: jdbc:postgresql://20.171.241.80:5432/kestra_db  # Change database from 'template1' to 'kestra'
       driverClassName: org.postgresql.Driver
-      username: app
-      password: XiuZzlNIOsne+pNfh7GpIg==
+      username: dbusername
+      password: dbpassword
 
 postgresql:
   enabled: false  # Ensure an external PostgreSQL is running

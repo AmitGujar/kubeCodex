@@ -17,7 +17,7 @@ tasks:
         url: https://MyInternalTesting@dev.azure.com/MyInternalTesting/Terraform_Azure_Infra/_git/Accelerator_Playground
         branch: main
         username: amit.gujar
-        password: 9uGxdi8ri4dKbNkOjNFF3vkyGcvYsOSXefMANEMWJxwPOwS737pwJQQJ99BCACAAAAAH2TR2AAASAZDO2nDK
+        password: 
 
       - id: Terraform
         type: io.kestra.plugin.terraform.cli.TerraformCLI
@@ -41,8 +41,8 @@ tasks:
           AWS_ACCESS_KEY_ID: ""
           AWS_SECRET_ACCESS_KEY: ""
           AWS_DEFAULT_REGION: ""
-          ARM_CLIENT_ID: "246cfd43-77c5-4c63-8f77-d6a19a3876ec"
+          ARM_CLIENT_ID: ""
           ARM_CLIENT_SECRET: ""
           ARM_TENANT_ID: ""
-          ARM_SUBSCRIPTION_ID: "ee22c8f0-93df-4b47-925a-d337fef522fe"
+          ARM_SUBSCRIPTION_ID: ""
  
