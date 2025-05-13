@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ado-sha
+  labels:
+    app: ado-sha
+spec:
+  selector:
+    matchLabels:
+      app: ado-sha
+  template:
+    metadata:
+      labels:
+        app: ado-sha
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: agentos
+                    operator: In
+                    values:
+                      - linux
+      containers:
+        - name: ado-sha
+          image: amitgujar/adoshaagent:ubuntu
+          env:
+            - name: AZP_URL
+              value: "https://dev.azure.com/MyInternalTesting"
+            - name: AZP_TOKEN
+              value: "azure_devops_token"
+            - name: AZP_POOL
+              value: "sha_for_aks"
+            - name: AZP_AGENT_NAME
+              value: "Docker-Agent-Linux"
